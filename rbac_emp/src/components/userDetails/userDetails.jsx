@@ -50,11 +50,12 @@ const styles = {
     gap: "15px",
     marginTop: '10px'
   },
-
+  
 };
 
 const UserDetails = () => {
-
+  
+  
   const navigate = useNavigate();
   const [toShow, setToShow] = useState(false);
   const [empData, setEmpData] = useState({
@@ -67,17 +68,16 @@ const UserDetails = () => {
     department: "",
     role: "",
   });
-
+  
   const { email = localStorage.getItem('emailId') } = useParams();
   // Query to fetch user profile
-
+  
   const { loading, error, data } = useQuery(GET_USER_PROFILE, {
     variables: {
       email, // Retrieve token from storage
     },
     onCompleted: (data) => {
       setEmpData({
-        // ...empData,
         id: data.getUserProfile.id,
         firstName: data.getUserProfile.firstName,
         lastName: data.getUserProfile.lastName,
@@ -88,28 +88,34 @@ const UserDetails = () => {
         role: data.getUserProfile.role,
       })
     },
-    fetchPolicy: "network-only", // Ensure latest data is fetched
+    fetchPolicy: "network-only",
   });
-
+  
+  
+  const [updateUserProfile] = useMutation(UPDATE_USER_DETAILS);
+  
   let accessPermissions = [];
-
+  
   const getPermissions = useQuery(GET_PERMISSIONS, {
     variables: {
       role: localStorage.getItem('role')
     },
-    // onCompleted(data){
-
-    // }
   })
+  
+  
+  if (getPermissions.loading) return <CircularProgress />;
+  if (getPermissions.error) return <Typography>Error: {getPermissions.error.message}</Typography>;
+  if (getPermissions.data) {
+    accessPermissions = getPermissions.data.getPermissions.permissions;
+  }
 
-  const [updateUserProfile] = useMutation(UPDATE_USER_DETAILS);
+  // accessPermissions === import.meta.env.PERMISSIONS.NO_ACCESS ? navigate('/') : null
 
-
+  
 
   if (loading) return <CircularProgress />; // Show loading indicator
 
   if (error) {
-    // console.log(localStorage.getItem('token'))
     console.error("Error fetching user profile:", error);
     return <Typography>Error fetching user profile</Typography>;
   }
@@ -120,14 +126,8 @@ const UserDetails = () => {
 
   if (updateUserProfile.loading) return <CircularProgress />; // Show loading indicator
   if (updateUserProfile.error) return <Typography>Error: {updateUserProfile.error.message}</Typography>;
+  
 
-
-
-  if (getPermissions.loading) return <CircularProgress />;
-  if (getPermissions.error) return <Typography>Error: {getPermissions.error.message}</Typography>;
-  if (getPermissions.data) {
-    accessPermissions = getPermissions.data.getPermissions.permissions;
-  }
 
 
   // update users
@@ -449,5 +449,4 @@ const UserDetails = () => {
 
   )
 };
-// };
 export default UserDetails
