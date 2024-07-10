@@ -12,6 +12,11 @@ module.exports = gql`
     role: String!
   }
 
+  type RolePermissions {
+    role: String!
+    permissions: [String!]!
+  }
+
   input hasPermissions {
     role: String!
     permissions: [String]!
@@ -43,7 +48,7 @@ module.exports = gql`
   type Query {
     getUserProfile(email: String!): User
     getAllUsers: [User!]!
-
+    getAllRoles: [RolePermissions!]!
     
   }
 
@@ -55,5 +60,5 @@ module.exports = gql`
     createRole (name: String!) : String
     deleteRole (name: String!) : String!
     updatePermissions (updatePermissions: hasPermissions!) : String!
-  }
+  } 
 `;

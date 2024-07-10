@@ -108,8 +108,8 @@ module.exports = {
 
     async getAllUsers() {
       try {
-        const users = await User.find();
-        return users;
+        const roles = await User.find();
+        return roles;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
       }

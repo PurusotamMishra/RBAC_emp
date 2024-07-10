@@ -76,5 +76,18 @@ module.exports = {
             }
         }
 
+    }, 
+
+    Query: {
+        
+        async getAllRoles() {
+            try {
+              const users = await hasPermissions.find();
+              return users;
+            } catch (error) {
+              throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
+            }
+          },
+
     }
 }
