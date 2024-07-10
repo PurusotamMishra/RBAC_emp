@@ -75,16 +75,12 @@ const UserList = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const { loading, error, data } = useQuery(GET_ALL_USERS);
+  console.log(data);
 
   // const [updateUserDetails] = useMutation();
 
-
-
   if (loading) return <CircularProgress />;
   if (error) return <Typography>Error: {error.message}</Typography>;
-
-
-
 
   return (
     <Container style={styles.root}>
@@ -104,8 +100,8 @@ const UserList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.getAllUsers.map((user) => (
-              (user.role !== "SUPER_ADMIN") ? (
+            {data.getAllUsers.map((user) =>
+              user.role !== "SUPER_ADMIN" ? (
                 <TableRow key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.firstName}</TableCell>
@@ -113,7 +109,7 @@ const UserList = () => {
                   <TableCell>{user.email}</TableCell>
                 </TableRow>
               ) : null
-            ))}
+            )}
           </TableBody>
         </Table>
         <Button
@@ -130,7 +126,7 @@ const UserList = () => {
           color="secondary"
           onClick={() => {
             try {
-              navigate('/employee');
+              navigate("/employee");
             } catch (err) {
               console.error(err);
             }
@@ -147,7 +143,6 @@ const UserList = () => {
           style={styles.snackbar}
         />
       </Paper>
-
     </Container>
   );
 };

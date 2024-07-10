@@ -32,7 +32,6 @@ module.exports = gql`
     department: String!
   }
 
- 
   input UpdateUserDetailsInput {
     firstName: String
     lastName: String
@@ -43,13 +42,10 @@ module.exports = gql`
     role: String
   }
 
-  
-
   type Query {
     getUserProfile(email: String!): User
     getAllUsers: [User!]!
     getAllRoles: [RolePermissions!]!
-    
   }
 
   type Mutation {
@@ -57,8 +53,8 @@ module.exports = gql`
     updateUserDetails(updatedDetails: UpdateUserDetailsInput!): User!
     deleteUser(email: String!): String!
 
-    createRole (name: String!) : String
-    deleteRole (name: String!) : String!
-    updatePermissions (updatePermissions: hasPermissions!) : String!
-  } 
+    createRole(name: String!): RolePermissions!
+    deleteRole(name: String!): String!
+    updatePermissions(updatePermissions: hasPermissions!): String!
+  }
 `;
