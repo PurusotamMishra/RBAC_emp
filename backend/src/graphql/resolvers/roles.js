@@ -1,4 +1,4 @@
-const {Role, Permission , hasPermissions  } = require("../../models/User");
+const { Role, Permission, hasPermissions } = require("../../models/User");
 
 const { GraphQLError } = require("graphql");
 
@@ -6,10 +6,10 @@ module.exports = {
     Mutation: {
         async createRole(_, { name }) {
 
-            try{
+            try {
                 const existingName = await Role.findOne({ name })
 
-                if(existingName){
+                if (existingName) {
                     throw new GraphQLError("Role already exists. You can update its permissions.")
                 }
 
@@ -24,44 +24,54 @@ module.exports = {
                 const res = await newRole.save();
                 const res2 = await newHasPermissions.save();
 
-                return(
-                    `Role created successfully! ${res} ` 
+                return (
+                    `Role created successfully! ${res} `
                 )
 
-            }catch(err){
+            } catch (err) {
                 throw new GraphQLError(`Failed to create role: ${err.message}`)
             }
         },
 
-        async deleteRole (_, { name }) {
-            try{
-                const existingName = await Role.findOne({name})
+        async deleteRole(_, { name }) {
+            try {
+                const existingName = await Role.findOne({ name })
 
-                if(!existingName){
+                if (!existingName) {
                     throw new GraphQLError("Role does not exists.")
                 }
 
                 const res = await Role.deleteOne({ name });
-                const res2 = await hasPermissions.deleteOne({role:name});
-                return(
+                const res2 = await hasPermissions.deleteOne({ role: name });
+                return (
                     "Role deleted successfully!"
                 )
 
-            }catch(err){
+            } catch (err) {
                 throw new GraphQLError(`Failed to delete role: ${err.message}`)
             }
         },
 
-        async updatePermissions (_, { hasPermissions }){
-            try{
-                const { role, permissions } = hasPermissions;
+        async updatePermissions(_, { updatePermissions }) {
+            try {
+                const { role, permissions } = updatePermissions;
 
-                const existingRole = await Role.findOne({role})
+                const existingRole = await Role.findOne({ role })
+                if (existingRole) {
+                    throw new GraphQLError("Role does not exist!")
+                }
+
+                const res = await hasPermissions.findOneAndUpdate(
+                    { role },
+                    { permissions },
+                );
+
+
                 return (
-                    "Permissions updated successfully!"
+                    "Roles and its permissions updated successfully!"
                 )
 
-            }catch(err){
+            } catch (err) {
                 throw new GraphQLError(`Failed to create role: ${err.message}`)
             }
         }

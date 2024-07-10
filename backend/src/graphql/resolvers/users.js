@@ -11,7 +11,7 @@ module.exports = {
       { registerInput: { id, firstName, lastName, email, phone, salary, department } }
     ) {
       try {
-        const existingUser = await Emp.findOne({ email });
+        const existingUser = await User.findOne({ email });
 
         if (existingUser) {
           throw new GraphQLError(
@@ -19,7 +19,7 @@ module.exports = {
           );
         }
 
-        const newUser = new Emp({
+        const newUser = new User({
           id,
           firstName,
           lastName,
@@ -108,7 +108,7 @@ module.exports = {
 
     async getAllUsers() {
       try {
-        const users = await userSchema.find();
+        const users = await User.find();
         return users;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
