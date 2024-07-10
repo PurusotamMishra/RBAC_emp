@@ -46,18 +46,19 @@ module.exports = gql`
   
 
   type Query {
-    getUserProfile(email: String!): User
+    getUserProfile (email: String!): User
     getAllUsers: [User!]!
     getAllRoles: [RolePermissions!]!
+    getPermissions (role: String!) : RolePermissions!
     
   }
 
   type Mutation {
-    registerUser(registerInput: RegisterInput!): User
+    registerUser(registerInput: RegisterInput!): User!
     updateUserDetails(updatedDetails: UpdateUserDetailsInput!): User!
     deleteUser(email: String!): String!
 
-    createRole (name: String!) : String
+    createRole (name: String!) : RolePermissions!
     deleteRole (name: String!) : String!
     updatePermissions (updatePermissions: hasPermissions!) : String!
   } 

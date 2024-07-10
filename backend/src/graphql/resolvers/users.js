@@ -8,7 +8,7 @@ module.exports = {
   Mutation: {
     async registerUser(
       _,
-      { registerInput: { id, firstName, lastName, email, phone, salary, department } }
+      { registerInput: { id, firstName, lastName, email, phone, salary, department, role } }
     ) {
       try {
         const existingUser = await User.findOne({ email });
@@ -46,15 +46,11 @@ module.exports = {
   
 
     async updateUserDetails(_, { updatedDetails }) {
-      const { firstName, lastName, email, phone, salary, department } = updatedDetails;
+      const { firstName, lastName, email, phone, salary, department, role } = updatedDetails;
       try {
         const user = await User.findOneAndUpdate(
-          { firstName },
-          { lastName },
           { email },
-          { phone },
-          { salary },
-          { department },
+          { firstName, lastName, phone, salary, department, role },
           { new: true }
         );
 

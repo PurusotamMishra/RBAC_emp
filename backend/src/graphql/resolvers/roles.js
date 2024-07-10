@@ -18,15 +18,16 @@ module.exports = {
                 })
                 const newHasPermissions = new hasPermissions({
                     role: name,
-                    permissions: ["NOACCESS"]
+                    permissions: ["NO_ACCESS"]
                 })
 
                 const res = await newRole.save();
                 const res2 = await newHasPermissions.save();
 
-                return (
-                    `Role created successfully! ${res} `
-                )
+                return {
+                    role: res2.role,
+                    permission: res2.permissions,
+                }
 
             } catch (err) {
                 throw new GraphQLError(`Failed to create role: ${err.message}`)
@@ -72,7 +73,7 @@ module.exports = {
                 )
 
             } catch (err) {
-                throw new GraphQLError(`Failed to create role: ${err.message}`)
+                throw new GraphQLError(`Failed to update Permission: ${err.message}`)
             }
         }
 
@@ -82,12 +83,28 @@ module.exports = {
         
         async getAllRoles() {
             try {
-              const users = await hasPermissions.find();
-              return users;
+              const roles = await hasPermissions.find();
+              return roles;
             } catch (error) {
               throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
             }
           },
+
+          async getPermissions(_, { role }) {
+            try{
+                const existingRole = await Role.find({role})
+                if(!existingRole){
+                    throw new GraphQLError(`Role does not exists!`)
+                }
+
+                const res = await hasPermissions.findOne({role})
+                return(
+                    res
+                )
+            }catch(err){
+                throw new GraphQLError(`Failed to fetch permissions: ${err.message}`)
+            }
+          }
 
     }
 }
