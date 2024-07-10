@@ -31,7 +31,7 @@ mutation UpdateUserDetails($updatedDetails: UpdateUserDetailsInput!) {
 `
 
 export const DELETE_USER = gql`
-mutation DeleteUser($deleteUser: String!) {
-    deleteUser(deleteUser: $deleteUser)
-  }
+mutation DeleteUser($email: String!) {
+  deleteUser(email: $email)
+}
 `

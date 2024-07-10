@@ -1,21 +1,8 @@
-// // import React from 'react'
-
-// const UserList = () => {
-//   return (
-//     <div>UserList</div>
-//   )
-// }
-
-// export default UserList
-
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 
-// import { UPDATE_USER_DETAILS } from "./graphql/mutations";
 import { DELETE_USER } from "../../graphql/mutations";
-// import { REGISTER_USER } from "../../graphql/mutations";
-import { GET_ALL_USERS } from "../../graphql/queries";
-// import { GET_USER_PROFILE } from "../../graphql/queries";
+import { GET_ALL_USERS, GET_PERMISSIONS } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -34,6 +21,11 @@ import {
   FormControl,
   Snackbar,
 } from "@mui/material";
+import ConfirmationDialog from "./confirmationDialog";
+
+import GridOnOutlinedIcon from '@mui/icons-material/GridOnOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+
 
 const styles = {
   root: {
@@ -54,6 +46,7 @@ const styles = {
 
   tableHeadCell: {
     fontWeight: "bold",
+    // alignItems: "right"
   },
   selectControl: {
     minWidth: "120px",
@@ -63,7 +56,7 @@ const styles = {
   },
   adminButton: {
     marginTop: "20px",
-    marginLeft: "5px",
+    marginRight: "5px",
   },
   snackbar: {
     marginBottom: "20px",
@@ -74,16 +67,50 @@ const UserList = () => {
   const navigate = useNavigate();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const { loading, error, data } = useQuery(GET_ALL_USERS);
+  
+  let accessPermissions = [];
 
-  // const [updateUserDetails] = useMutation();
+  const getPermissions = useQuery(GET_PERMISSIONS, {
+    variables: {
+      role: localStorage.getItem('role')
+    },
+    // onCompleted(data){
 
-
+    // }
+  })
+  const [deleteUser] = useMutation(DELETE_USER);
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography>Error: {error.message}</Typography>;
 
 
+
+  const handleDeleteUser = async () => {
+    // console.log("Hello")
+    const email = localStorage.getItem('emailId');
+    await deleteUser({
+      variables: {
+        email,
+      },
+    })
+    // return (
+    //   // console.log("Successfully")
+    // )
+  }
+
+
+  if (deleteUser.loading) return <CircularProgress />;
+  if (deleteUser.error) return <Typography>Error: {deleteUser.error.message}</Typography>;
+
+
+  if (getPermissions.loading) return <CircularProgress />;
+  if (getPermissions.error) return <Typography>Error: {getPermissions.error.message}</Typography>;
+  if (getPermissions.data) {
+    accessPermissions = getPermissions.data.getPermissions.permissions;
+  }
 
 
   return (
@@ -99,37 +126,67 @@ const UserList = () => {
               <TableCell style={styles.tableHeadCell}>First Name</TableCell>
               <TableCell style={styles.tableHeadCell}>Last Name</TableCell>
               <TableCell style={styles.tableHeadCell}>Email</TableCell>
-              {/* View  */}
-              {/* Delete */}
+              {(accessPermissions.includes(import.meta.env.VITE_PERMISSIONS.DELETE)) ? (
+                <>
+                  <TableCell style={styles.tableHeadCell}>Actions</TableCell>
+                  {/* <TableCell style={styles.tableHeadCell}>Delete</TableCell> */}
+                </>
+              ) : null
+              }
             </TableRow>
           </TableHead>
           <TableBody>
             {data.getAllUsers.map((user) => (
-              (user.role !== "SUPER_ADMIN") ? (
+              (user.role !== "ROOT") ? (
                 <TableRow key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.firstName}</TableCell>
                   <TableCell>{user.lastName}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  {(accessPermissions.includes(import.meta.env.VITE_PERMISSIONS.DELETE)) ? (
+
+                    <>
+                      <TableCell>
+                        <Button onClick={() => {
+                          localStorage.setItem('emailId', user.email)
+                          return (
+                            navigate('/employee')
+                          )
+                        }}>
+                          <GridOnOutlinedIcon />
+                        </Button>
+                      {/* </TableCell>
+                      <TableCell> */}
+                        <Button onClick={() => {
+                          localStorage.setItem('emailId', user.email);
+                          // console.log(user.email)
+                          setDialogOpen(true);
+
+                          // handleDeleteUser();
+                        }}>
+                          <DeleteOutlinedIcon />
+                        </Button>
+                        <ConfirmationDialog
+                          open={dialogOpen}
+                          onClose={() => setDialogOpen(false)}
+                          onConfirm={handleDeleteUser}
+                        />
+                      </TableCell>
+                    </>
+                  ) : null}
                 </TableRow>
               ) : null
             ))}
           </TableBody>
         </Table>
-        <Button
-          style={styles.logoutButton}
-          variant="contained"
-          color="primary"
-          // onClick={handleLogout}
-        >
-          Logout
-        </Button>
+
         <Button
           style={styles.adminButton}
           variant="contained"
           color="secondary"
           onClick={() => {
             try {
+              localStorage.setItem('emailId', localStorage.getItem('userEmail'))
               navigate('/employee');
             } catch (err) {
               console.error(err);
@@ -138,6 +195,34 @@ const UserList = () => {
         >
           Your Profile
         </Button>
+
+        {(accessPermissions.includes(import.meta.env.VITE_PERMISSIONS.CREATE)) ?
+          <Button
+            style={styles.adminButton}
+            variant="contained"
+            color="primary"
+          onClick={ () => {
+            navigate('/register')
+          }}
+          >
+            Add New Employee
+          </Button>
+          : null}
+        <Button
+          style={styles.logoutButton}
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            localStorage.removeItem('role')
+            localStorage.removeItem('userEmail')
+            return (
+              navigate('/')
+            )
+          }}
+        >
+          Logout
+        </Button>
+
 
         <Snackbar
           open={snackbarOpen}

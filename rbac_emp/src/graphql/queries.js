@@ -29,3 +29,19 @@ export const GET_ALL_USERS = gql`
   }
 }
 `;
+
+export const GET_ALL_ROLES = gql`
+query GetAllRoles {
+  getAllRoles {
+    role
+    permissions
+  }
+}
+`;
+
+export const GET_PERMISSIONS = gql`
+query GetPermissions($role: String!) {
+  getPermissions(role: $role) {
+    permissions
+  }
+}`
