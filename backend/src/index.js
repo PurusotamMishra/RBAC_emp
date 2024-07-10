@@ -12,8 +12,6 @@ const server = new ApolloServer({
   resolvers,
 });
 
-
-
 async function startServer() {
   try {
     await mongoose.connect(MONGODB_URI);
@@ -24,7 +22,6 @@ async function startServer() {
     })
 
     console.log(`Server running at ${url}`);
-
   } catch (err) {
     console.error("Error connecting to MongoDB:", err.message);
   }

@@ -44,10 +44,7 @@ module.exports = {
 
                 const res = await Role.deleteOne({ name });
                 const res2 = await hasPermissions.deleteOne({ role: name });
-                return (
-                    "Role deleted successfully!"
-                )
-
+                return "Role deleted successfully!"
             } catch (err) {
                 throw new GraphQLError(`Failed to delete role: ${err.message}`)
             }
@@ -67,44 +64,39 @@ module.exports = {
                     { permissions },
                 );
 
-
-                return (
-                    "Roles and its permissions updated successfully!"
-                )
-
+                return "Roles and its permissions updated successfully!"
             } catch (err) {
                 throw new GraphQLError(`Failed to update Permission: ${err.message}`)
             }
         }
-
-    }, 
+    },
 
     Query: {
-        
+
         async getAllRoles() {
             try {
-              const roles = await hasPermissions.find();
-              return roles;
+                const roles = await hasPermissions.find();
+                return roles;
             } catch (error) {
-              throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
+                throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
             }
-          },
+        },
 
-          async getPermissions(_, { role }) {
-            try{
-                const existingRole = await Role.find({role})
-                if(!existingRole){
+        async getPermissions(_, { role }) {
+            try {
+                const existingRole = await Role.find({ role })
+                if (!existingRole) {
                     throw new GraphQLError(`Role does not exists!`)
                 }
 
-                const res = await hasPermissions.findOne({role})
-                return(
+                const res = await hasPermissions.findOne({ role })
+                return (
                     res
                 )
-            }catch(err){
+            } catch (err) {
                 throw new GraphQLError(`Failed to fetch permissions: ${err.message}`)
             }
-          }
+        }
 
     }
 }

@@ -1,6 +1,5 @@
 const usersResolvers = require("./users");
 const rolesResolvers = require("./roles");
-const roles = require("./roles");
 
 module.exports = {
   Query: {

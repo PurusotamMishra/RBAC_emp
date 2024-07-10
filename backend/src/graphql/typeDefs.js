@@ -32,7 +32,6 @@ module.exports = gql`
     department: String!
   }
 
- 
   input UpdateUserDetailsInput {
     firstName: String
     lastName: String
@@ -43,14 +42,12 @@ module.exports = gql`
     role: String
   }
 
-  
 
   type Query {
     getUserProfile (email: String!): User
     getAllUsers: [User!]!
     getAllRoles: [RolePermissions!]!
     getPermissions (role: String!) : RolePermissions!
-    
   }
 
   type Mutation {
