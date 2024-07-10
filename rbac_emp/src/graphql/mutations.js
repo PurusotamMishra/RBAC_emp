@@ -28,10 +28,32 @@ mutation UpdateUserDetails($updatedDetails: UpdateUserDetailsInput!) {
       role
     }
   }
-`
+`;
 
 export const DELETE_USER = gql`
 mutation DeleteUser($email: String!) {
   deleteUser(email: $email)
 }
-`
+`;
+
+export const CREATE_ROLE_MUTATION = gql`
+  mutation CreateRole($name: String!) {
+    createRole(name: $name) {
+      role
+      permissions
+    }
+  }
+`;
+
+export const DELETE_ROLE_MUTATION = gql`
+  mutation DeleteRole($name: String!) {
+    deleteRole(name: $name)
+  }
+`;
+
+export const UPDATE_PERMISSIONS_MUTATION = gql`
+  mutation UpdatePermissions($updatePermissions: hasPermissions!) {
+    updatePermissions(updatePermissions: $updatePermissions)
+  }
+`;
+

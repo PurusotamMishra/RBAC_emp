@@ -7,7 +7,7 @@ import Select from '@mui/material/Select';
 import { Button, CircularProgress, Typography } from '@mui/material';
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { GET_ALL_ROLES, GET_ALL_USERS } from '../graphql/queries';
+import { GET_ALL_ROLES, GET_ALL_USERS } from '../../graphql/queries';
 import { useQuery } from '@apollo/client';
 
 
