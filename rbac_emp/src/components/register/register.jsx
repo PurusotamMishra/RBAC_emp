@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useMutation } from "@apollo/client";
+
+import { useQuery, useMutation } from "@apollo/client";
 import { REGISTER_USER } from "../../graphql/mutations";
+import { GET_PERMISSIONS } from "../../graphql/queries";
 import { useNavigate } from "react-router-dom";
+import { PERMISSIONS } from '../../../const'
 
 import {
     Button,
@@ -12,6 +15,7 @@ import {
     Paper,
     Select,
     MenuItem,
+    CircularProgress
 } from "@mui/material";
 
 const paperStyle = {
@@ -49,8 +53,16 @@ const Register = () => {
 
     const [registerUser, { loading, error, data }] = useMutation(REGISTER_USER);
 
+    let accessPermissions = [];
 
+    const getPermissions = useQuery(GET_PERMISSIONS, {
+        variables: {
+            role: localStorage.getItem('role')
+        },
+        // onCompleted(data){
 
+        // }
+    })
 
     const handleSubmit = async (e) => {
 
@@ -71,31 +83,14 @@ const Register = () => {
             });
             // console.log(response);
             navigate('/getall')
-            // console.log("Registration response:", response);
+            window.location.reload();
+            
         } catch (err) {
             console.error("Error registering user:", err.message);
         }
     };
 
-    // const [inputErrors, setInputErrors] = useState({
-    //     email: "",
-    // });
 
-
-    // const validateField = (fieldName, value) => {
-    //     switch (fieldName) {
-    //         case "email":
-    //             const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    //             if (!emailRegex.test(value)) {
-    //                 setInputErrors({ ...inputErrors, email: "Invalid email address" });
-    //             } else {
-    //                 setInputErrors({ ...inputErrors, email: "" });
-    //             }
-
-    //             break;
-    //         default: ;
-    //     }
-    // };
     const [formData, setFormData] = useState({
         id: "",
         firstname: "",
@@ -112,129 +107,159 @@ const Register = () => {
         //validateField(e.target.name, e.target.value)
     }
 
+
+
+    if (getPermissions.loading) return <CircularProgress />;
+    if (getPermissions.error) return <Typography>Error: {getPermissions.error.message}</Typography>;
+    if (getPermissions.data) {
+        accessPermissions = getPermissions.data.getPermissions.permissions;
+    }
+
     return (
-        <Container component="main" maxWidth="xs">
+        (accessPermissions.includes(PERMISSIONS.CREATE)) ?
 
-            <Paper style={paperStyle} elevation={3}>
-                <Typography component="h2" variant="h5">
-                    REGISTER
-                </Typography>
-                <form style={formStyle} onSubmit={handleSubmit} >
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="id"
-                        label="id "
-                        name="id"
-                        autoFocus
-                        value={formData.id}
-                        onChange={handleChange}
-                    />
-                    <div style={flex2}>
-                        <div style={{ flex: 1 }}>
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="firstname"
-                                label="First Name"
-                                name="firstname"
-                                autoFocus
-                                value={formData.firstname}
-                                onChange={handleChange}
-                            />
+            <Container component="main" maxWidth="xs">
+
+                <Paper style={paperStyle} elevation={3}>
+                    <Typography component="h2" variant="h5">
+                        REGISTER
+                    </Typography>
+                    <form style={formStyle} onSubmit={handleSubmit} >
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="id"
+                            label="id "
+                            name="id"
+                            autoFocus
+                            value={formData.id}
+                            onChange={handleChange}
+                        />
+                        <div style={flex2}>
+                            <div style={{ flex: 1 }}>
+                                <TextField
+                                    variant="outlined"
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="firstname"
+                                    label="First Name"
+                                    name="firstname"
+                                    autoFocus
+                                    value={formData.firstname}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <TextField
+                                    variant="outlined"
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="lastname"
+                                    label="Last Name"
+                                    name="lastname"
+                                    autoFocus
+                                    value={formData.lastname}
+                                    onChange={handleChange}
+                                />
+                            </div>
                         </div>
-                        <div style={{ flex: 1 }}>
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="lastname"
-                                label="Last Name"
-                                name="lastname"
-                                autoFocus
-                                value={formData.lastname}
-                                onChange={handleChange}
-                            />
+
+
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="email"
+                            label="Email Address"
+                            name="email"
+                            autoComplete="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="phno"
+                            label="Phone no"
+                            name="phno"
+                            autoFocus
+                            value={formData.phno}
+                            onChange={handleChange}
+                        />
+                        <div style={flex2}>
+                            <div style={{ flex: 1 }}>
+                                <TextField
+                                    variant="outlined"
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="salary"
+                                    label="Salary "
+                                    name="salary"
+                                    type="number"
+                                    autoFocus
+                                    value={formData.salary}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div style={{ flex: 1 }}>
+
+                                <TextField
+                                    variant="outlined"
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="department"
+                                    label="Department"
+                                    name="department"
+                                    autoFocus
+                                    value={formData.department}
+                                    onChange={handleChange}
+                                />
+                            </div>
                         </div>
-                    </div>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            style={submitButtonStyle}
+                        >
+                            Submit
+                        </Button>
+                    </form>
 
 
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="phno"
-                        label="Phone no"
-                        name="phno"
-                        autoFocus
-                        value={formData.phno}
-                        onChange={handleChange}
-                    />
-                    <div style={flex2}>
-                        <div style={{ flex: 1 }}>
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="salary"
-                                label="Salary "
-                                name="salary"
-                                type="number"
-                                autoFocus
-                                value={formData.salary}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div style={{ flex: 1 }}>
+                </Paper>
 
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="department"
-                                label="Department"
-                                name="department"
-                                autoFocus
-                                value={formData.department}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        style={submitButtonStyle}
-                    >
-                        Submit
-                    </Button>
-                </form>
+            </Container>
 
+            :
+            <>
+                <h1>YOU DO NOT HAVE ACCESS TO THIS PAGE!</h1>
+                <Button
+                    //   style={styles.logoutButton}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                        localStorage.removeItem('role')
+                        localStorage.removeItem('userEmail')
+                        return (
+                            navigate('/')
+                        )
+                    }}
+                >
+                    Logout
+                </Button>
 
-            </Paper>
-
-        </Container>
+            </>
 
     );
 

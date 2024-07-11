@@ -26,7 +26,7 @@ module.exports = {
 
                 return {
                     role: res2.role,
-                    permission: res2.permissions,
+                    permissions: res2.permissions,
                 }
 
             } catch (err) {

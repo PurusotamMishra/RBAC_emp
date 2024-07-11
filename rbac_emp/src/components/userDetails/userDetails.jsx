@@ -3,6 +3,7 @@ import { useState } from "react";
 import { GET_USER_PROFILE , GET_PERMISSIONS} from "../../graphql/queries";
 import { UPDATE_USER_DETAILS } from "../../graphql/mutations";
 import { useNavigate, useParams } from "react-router-dom";
+import { PERMISSIONS } from  '../../../const';
 import {
   Container,
   Typography,
@@ -163,6 +164,26 @@ const UserDetails = () => {
 
   }
   return (
+    (accessPermissions.includes(PERMISSIONS.NO_ACCESS)) ? 
+    <>
+    <h1>YOU DO NOT HAVE ACCESS TO THIS PAGE!</h1>
+    <Button
+          style={styles.logoutButton}
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            localStorage.removeItem('role')
+            localStorage.removeItem('userEmail')
+            return (
+              navigate('/')
+            )
+          }}
+        >
+          Logout
+        </Button>
+    
+    </>
+    :
     <Container style={styles.root} component="main" maxWidth="md">
       <Typography variant="h4" align="center" gutterBottom>
         Welcome to User Profile
@@ -273,7 +294,7 @@ const UserDetails = () => {
               All Employees
             </Button>
 
-            {(accessPermissions.includes(import.meta.env.VITE_PERMISSIONS.UPDATE)) ?
+            {(accessPermissions.includes(PERMISSIONS.UPDATE)) ?
             <Button
               style={styles.logoutButton}
               variant="contained"

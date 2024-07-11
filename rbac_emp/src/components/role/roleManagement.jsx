@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -32,6 +33,7 @@ import {
   CREATE_ROLE_MUTATION,
   DELETE_ROLE_MUTATION,
 } from "../../graphql/mutations";
+import { PERMISSIONS } from '../../../const';
 
 const styles = {
   root: {
@@ -62,6 +64,7 @@ const styles = {
   },
   addbutton: {
     marginTop: "20px",
+    marginLeft: "5px"
   },
   adminButton: {
     marginTop: "20px",
@@ -73,6 +76,7 @@ const styles = {
 };
 
 const RoleManagement = () => {
+  const navigate = useNavigate();
   const { loading, error, data } = useQuery(GET_ALL_ROLES);
   const [updatePermissions] = useMutation(UPDATE_PERMISSIONS_MUTATION);
   const [createRole] = useMutation(CREATE_ROLE_MUTATION);
@@ -102,7 +106,6 @@ const RoleManagement = () => {
             NO_ACCESS: false,
             READ: false,
             CREATE: false,
-            EDIT: false,
             UPDATE: false,
             DELETE: false,
           }
@@ -161,7 +164,7 @@ const RoleManagement = () => {
     try {
       const { data } = await createRole({ variables: { name: newRoleName } });
       const newRole = data.createRole;
-      console.log("handleRole ==> ", { data, newRole });
+
 
       setRoles((prevRoles) => [...prevRoles, newRole]);
 
@@ -171,7 +174,6 @@ const RoleManagement = () => {
           NO_ACCESS: false,
           READ: false,
           CREATE: false,
-          EDIT: false,
           UPDATE: false,
           DELETE: false,
         },
@@ -231,131 +233,152 @@ const RoleManagement = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  console.log("rolesroles ", roles);
-
+  // console.log("rolesroles ", roles);
   return (
-    <Container styles={styles.root}>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Role</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="New Role Name"
-            type="text"
-            fullWidth
-            value={newRoleName}
-            onChange={(e) => setNewRoleName(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleAddRole} color="primary">
-            Add Role
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Delete Role</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete the role "{roleToDelete}"?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDeleteRole} color="primary">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-      <Paper style={styles.paper} elevation={3}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell style={styles.tableHeadCell}>Role Name</TableCell>
-              <TableCell style={styles.tableHeadCell}>Permissions</TableCell>
-              <TableCell style={styles.tableHeadCell}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {roles.map((role) => (
-              <TableRow key={role.role}>
-                <TableCell style={styles.tableCell}>{role.role}</TableCell>
-                <TableCell>
-                  <FormGroup row>
-                    {[
-                      "NO_ACCESS",
-                      "READ",
-                      "CREATE",
-                      "EDIT",
-                      "UPDATE",
-                      "DELETE",
-                    ].map((permission) => (
-                      <FormControlLabel
-                        key={permission}
-                        control={
-                          <Checkbox
-                            checked={
-                              permissions[role.role]
-                                ? permissions[role.role][permission]
-                                : false
+
+    localStorage.getItem('role') === "ROOT" ?
+      (
+        <Container styles={styles.root}>
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Add Role</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="New Role Name"
+                type="text"
+                fullWidth
+                value={newRoleName}
+                onChange={(e) => setNewRoleName(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={handleAddRole} color="primary">
+                Add Role
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+            <DialogTitle>Delete Role</DialogTitle>
+            <DialogContent>
+              <Typography>
+                Are you sure you want to delete the role <b>{roleToDelete}</b>?
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDeleteDialog} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmDeleteRole} color="primary">
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+          >
+            <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+          <Paper style={styles.paper} elevation={3}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell style={styles.tableHeadCell}>Role Name</TableCell>
+                  <TableCell style={styles.tableHeadCell}>Permissions</TableCell>
+                  <TableCell style={styles.tableHeadCell}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {roles.map((role) => (
+                  <TableRow key={role.role}>
+                    <TableCell style={styles.tableCell}>{role.role}</TableCell>
+                    <TableCell>
+                      <FormGroup row>
+                        {[
+                          PERMISSIONS.NO_ACCESS,
+                          PERMISSIONS.CREATE,
+                          PERMISSIONS.READ,
+                          PERMISSIONS.UPDATE,
+                          PERMISSIONS.DELETE,
+                        ].map((permission) => (
+                          <FormControlLabel
+                            key={permission}
+                            control={
+                              <Checkbox
+                                checked={
+                                  permissions[role.role]
+                                    ? permissions[role.role][permission]
+                                    : false
+                                }
+                                onChange={(e) =>
+                                  handlePermissionChange(role.role, e)
+                                }
+                                name={permission}
+                              />
                             }
-                            onChange={(e) =>
-                              handlePermissionChange(role.role, e)
+                            label={
+                              permission.charAt(0).toUpperCase() +
+                              permission.slice(1)
                             }
-                            name={permission}
                           />
-                        }
-                        label={
-                          permission.charAt(0).toUpperCase() +
-                          permission.slice(1)
-                        }
-                      />
-                    ))}
-                  </FormGroup>
-                </TableCell>
-                <TableCell>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleUpdatePermissions(role.role)}
-                  >
-                    <UpdateIcon />
-                  </IconButton>
-                  <IconButton
-                    color="secondary"
-                    onClick={() => handleOpenDeleteDialog(role.role)}
-                  >
-                    <DeleteOutlineIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                        ))}
+                      </FormGroup>
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleUpdatePermissions(role.role)}
+                      >
+                        <UpdateIcon />
+                      </IconButton>
+                      <IconButton
+                        color="secondary"
+                        onClick={() => handleOpenDeleteDialog(role.role)}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Button
+              style={styles.addbutton}
+              variant="contained"
+              color="primary"
+              onClick={handleClickOpen}
+            >
+              <AddIcon /> Add Role
+            </Button>
+            <Button
+              style={styles.addbutton}
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                navigate('/getall')
+              }} >All Employees</Button>
+          </Paper>
+        </Container>
+      ) :
+      (<>
+        <h1> YOU DO NOT HAVE ACCESS TO THIS PAGE!</h1>
         <Button
           style={styles.addbutton}
           variant="contained"
-          color="primary"
-          onClick={handleClickOpen}
-        >
-          <AddIcon /> Add Role
-        </Button>
-      </Paper>
-    </Container>
+          color="secondary"
+          onClick={() => {
+            navigate('/getall')
+          }} >All Employees</Button>
+
+      </>)
+
   );
 };
 
