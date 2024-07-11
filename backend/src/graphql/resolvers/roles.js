@@ -23,7 +23,6 @@ module.exports = {
 
                 const res = await newRole.save();
                 const res2 = await newHasPermissions.save();
-
                 return {
                     role: res2.role,
                     permissions: res2.permissions,
