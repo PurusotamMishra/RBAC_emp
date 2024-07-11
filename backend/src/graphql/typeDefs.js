@@ -10,6 +10,7 @@ module.exports = gql`
     salary: Int!
     department: String!
     role: String!
+    isActive: Boolean!
   }
 
   type RolePermissions {
@@ -23,7 +24,6 @@ module.exports = gql`
   }
 
   input RegisterInput {
-    id: String!
     firstName: String!
     lastName: String
     email: String!
@@ -53,7 +53,7 @@ module.exports = gql`
   type Mutation {
     registerUser(registerInput: RegisterInput!): User!
     updateUserDetails(updatedDetails: UpdateUserDetailsInput!): User!
-    deleteUser(email: String!): String!
+    deleteUser(email: String!, isActive: Boolean!): String!
 
     createRole (name: String!) : RolePermissions!
     deleteRole (name: String!) : String!

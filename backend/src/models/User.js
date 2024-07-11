@@ -9,8 +9,9 @@ const userSchema = new Schema({
   role: { type: String, default: "EMP" },
   salary: { type: Number},
   department: { type: String},
+  isActive: {type: Boolean, default: "True"},
 });
-// const { model, Schema } = require("mongoose");
+// const { model, Schema } = require("mongoose");   
 
 const roles = new Schema({
     name: { type: String, unique: true },

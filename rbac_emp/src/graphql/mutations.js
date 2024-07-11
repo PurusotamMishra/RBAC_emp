@@ -11,6 +11,7 @@ export const REGISTER_USER = gql`
     salary
     department
     role
+    isActive
   }
 }
 `;
@@ -31,8 +32,8 @@ mutation UpdateUserDetails($updatedDetails: UpdateUserDetailsInput!) {
 `;
 
 export const DELETE_USER = gql`
-mutation DeleteUser($email: String!) {
-  deleteUser(email: $email)
+mutation DeleteUser($email: String!, $isActive: Boolean!) {
+  deleteUser(email: $email, isActive: $isActive)
 }
 `;
 

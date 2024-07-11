@@ -11,6 +11,7 @@ query GetUserProfile($email: String!) {
     salary
     department
     role
+    isActive
   }
 }`;
 
@@ -26,6 +27,7 @@ export const GET_ALL_USERS = gql`
     salary
     department
     role
+    isActive
   }
 }
 `;

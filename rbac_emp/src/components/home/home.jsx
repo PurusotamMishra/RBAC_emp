@@ -11,30 +11,22 @@ import { GET_ALL_ROLES, GET_ALL_USERS } from '../../graphql/queries';
 import { useQuery } from '@apollo/client';
 
 
-{/* 
-state manage -- userList
-constants bana na hai 
-accessmanage
-folder structure
-merging
-routing
-
-final code push 
-*/}
-
-
 const Home = () => {
     const navigate = useNavigate();
     const [role, setRole] = useState('');
     const [user, setUser] = useState('');
+    const [userEmail, setuserEmail] = useState('');
 
     const handleChangeRole = (event) => {
         setRole(event.target.value);
         localStorage.setItem('role', event.target.value);
     };
+
     const handleChangeUser = (e) => {
         setUser(e.target.value);
-        localStorage.setItem('userEmail', e.target.value);
+
+        // localStorage.setItem('userEmail', e.target.value);
+        setuserEmail(e.target.value);
         localStorage.setItem('emailId', e.target.value);
     }
     // console.log(role)
@@ -49,6 +41,9 @@ const Home = () => {
     // console.log(allUsers.data.getAllUsers)
 
 
+    (localStorage.getItem('userEmail')) ?
+        navigate('/getall')
+        : null
 
     return (
         <div>
@@ -56,7 +51,7 @@ const Home = () => {
                 <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">Roles</InputLabel>
                     <Select
-                    
+
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={role}
@@ -87,11 +82,11 @@ const Home = () => {
                         ))}
                     </Select>
 
-
                 </FormControl>
-                <Button onClick={() =>
+                <Button onClick={() => {
+                    localStorage.setItem('userEmail', userEmail)
                     navigate('/getall')
-                }>
+                }}>
                     Done
                 </Button>
             </Box>

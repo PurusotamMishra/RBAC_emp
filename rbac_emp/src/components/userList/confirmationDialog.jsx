@@ -7,7 +7,11 @@ import Button from '@mui/material/Button';
 
 const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      sx={{ '& .MuiBackdrop-root': { backgroundColor: 'transparent', }, }} 
+      >
       <DialogTitle>Confirm Delete</DialogTitle>
       <DialogContent>
         Are you sure you want to delete this user?

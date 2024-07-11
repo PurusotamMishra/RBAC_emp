@@ -8,7 +8,7 @@ module.exports = {
   Mutation: {
     async registerUser(
       _,
-      { registerInput: { id, firstName, lastName, email, phone, salary, department, role } }
+      { registerInput: {firstName, lastName, email, phone, salary, department } }
     ) {
       try {
         const existingUser = await User.findOne({ email });
@@ -18,9 +18,11 @@ module.exports = {
             "User already exists with this email: " + email
           );
         }
+        const userCount = await User.countDocuments(); // Get the total number of users
+        const newId = (1000 + userCount).toString();
 
         const newUser = new User({
-          id,
+          id: newId,
           firstName,
           lastName,
           phone,
@@ -28,13 +30,14 @@ module.exports = {
           salary,
           department,
           role: "EMP",
+          isActive: true,
         });
 
-
         const res = await newUser.save();
+        const idsave= newUser.id;
 
         return {
-          // id: res.id,
+          idsave,
           // ...res._doc,
           ...res._doc
         };
@@ -43,7 +46,7 @@ module.exports = {
       }
     },
 
-  
+
 
     async updateUserDetails(_, { updatedDetails }) {
       const { firstName, lastName, email, phone, salary, department, role } = updatedDetails;
@@ -65,7 +68,7 @@ module.exports = {
       }
     },
 
-    async deleteUser(_, { email } ) {
+    async deleteUser(_, { email, isActive }) {
       try {
         const existingUser = await User.findOne({ email });
 
@@ -75,15 +78,20 @@ module.exports = {
           );
         }
 
-        const res = await User.deleteOne({ email });
+        // const res = await User.deleteOne({ email });
+        const user = await User.findOneAndUpdate(
+          { email },
+          { isActive },
+          { new: true }
+        );
 
-        return(
+        return (
           "User deleted successfully!"
         )
 
 
-      }catch(err){
-        throw new GraphQLError (`Failed to delete user: ${err.message}`)
+      } catch (err) {
+        throw new GraphQLError(`Failed to delete user: ${err.message}`)
       }
     }
   },

@@ -1,9 +1,9 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { useState } from "react";
-import { GET_USER_PROFILE , GET_PERMISSIONS} from "../../graphql/queries";
+import { GET_USER_PROFILE, GET_PERMISSIONS, GET_ALL_ROLES } from "../../graphql/queries";
 import { UPDATE_USER_DETAILS } from "../../graphql/mutations";
 import { useNavigate, useParams } from "react-router-dom";
-import { PERMISSIONS } from  '../../../const';
+import { PERMISSIONS } from '../../../const';
 import {
   Container,
   Typography,
@@ -16,9 +16,11 @@ import {
   TableContainer,
   // TableHead,
   TableRow,
-  FormControl,
+  InputLabel,
   TextField,
-  FormLabel
+  FormLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 
 
@@ -49,15 +51,18 @@ const styles = {
     gridTemplateColumns: '1fr 4fr',
     alignItems: "center",
     gap: "15px",
-    marginTop: '10px'
+    // marginTop: '10px',
   },
-  
+
 };
 
 const UserDetails = () => {
-  
-  
+
+
   const navigate = useNavigate();
+  !localStorage.getItem('userEmail') ? navigate('/') : null
+
+  // const [role, setRole] = useState('');
   const [toShow, setToShow] = useState(false);
   const [empData, setEmpData] = useState({
     id: "",
@@ -69,10 +74,12 @@ const UserDetails = () => {
     department: "",
     role: "",
   });
-  
+
   const { email = localStorage.getItem('emailId') } = useParams();
   // Query to fetch user profile
-  
+  const allRoles = useQuery(GET_ALL_ROLES);
+
+
   const { loading, error, data } = useQuery(GET_USER_PROFILE, {
     variables: {
       email, // Retrieve token from storage
@@ -91,28 +98,33 @@ const UserDetails = () => {
     },
     fetchPolicy: "network-only",
   });
-  
-  
+
+
   const [updateUserProfile] = useMutation(UPDATE_USER_DETAILS);
-  
+
   let accessPermissions = [];
-  
+
   const getPermissions = useQuery(GET_PERMISSIONS, {
     variables: {
       role: localStorage.getItem('role')
     },
   })
-  
-  
+
+
   if (getPermissions.loading) return <CircularProgress />;
   if (getPermissions.error) return <Typography>Error: {getPermissions.error.message}</Typography>;
   if (getPermissions.data) {
     accessPermissions = getPermissions.data.getPermissions.permissions;
   }
 
+
+  if (allRoles.loading) return <CircularProgress />;
+  if (allRoles.error) return <Typography>Error: {allRoles.error.message}</Typography>;
+
+
   // accessPermissions === import.meta.env.PERMISSIONS.NO_ACCESS ? navigate('/') : null
 
-  
+
 
   if (loading) return <CircularProgress />; // Show loading indicator
 
@@ -127,7 +139,7 @@ const UserDetails = () => {
 
   if (updateUserProfile.loading) return <CircularProgress />; // Show loading indicator
   if (updateUserProfile.error) return <Typography>Error: {updateUserProfile.error.message}</Typography>;
-  
+
 
 
 
@@ -158,22 +170,24 @@ const UserDetails = () => {
     } catch (err) {
       console.error("update:", err)
     }
-
-    // console.log(res);
-
-
+    
   }
+  const handleChangeRole = (e) => {
+    setEmpData({ ...empData, [e.target.name]: e.target.value });
+    // localStorage.setItem('role', event.target.value);
+  };
   return (
-    (accessPermissions.includes(PERMISSIONS.NO_ACCESS)) ? 
-    <>
-    <h1>YOU DO NOT HAVE ACCESS TO THIS PAGE!</h1>
-    <Button
+    (accessPermissions.includes(PERMISSIONS.NO_ACCESS)) ?
+      <>
+        <h1>YOU DO NOT HAVE ACCESS TO THIS PAGE!</h1>
+        <Button
           style={styles.logoutButton}
           variant="contained"
           color="primary"
           onClick={() => {
-            localStorage.removeItem('role')
-            localStorage.removeItem('userEmail')
+            // localStorage.removeItem('role')
+            // localStorage.removeItem('userEmail')
+            localStorage.clear();
             return (
               navigate('/')
             )
@@ -181,292 +195,302 @@ const UserDetails = () => {
         >
           Logout
         </Button>
-    
-    </>
-    :
-    <Container style={styles.root} component="main" maxWidth="md">
-      <Typography variant="h4" align="center" gutterBottom>
-        Welcome to User Profile
-      </Typography>
-      <Paper style={styles.paper} elevation={3}>
 
-        {(!toShow) ? (
-          <>
-            <TableContainer>
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">Emp ID: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.id}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">First Name: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.firstName}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">Last Name: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.lastName}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">Email: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.email}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">Phone No: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.phone}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">Salary: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.salary}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">Department: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.department}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      <Typography fontWeight="bold">Role: </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="h6">
-                        {data.getUserProfile.role}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+      </>
+      :
+      <Container style={styles.root} component="main" maxWidth="md">
+        <Typography variant="h4" align="center" gutterBottom>
+          Welcome to User Profile
+        </Typography>
+        <Paper style={styles.paper} elevation={3}>
 
-            <Button
-              style={styles.adminButton}
-              variant="contained"
-              color="secondary"
-              onClick={() => {
-                localStorage.removeItem('emailId')
-                // localStorage.removeItem('userEmail')
-                return (
-                  navigate('/getall')
-                )
-              }}
+          {(!toShow) ? (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">Emp ID: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.id}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">First Name: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.firstName}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">Last Name: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.lastName}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">Email: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.email}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">Phone No: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.phone}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">Salary: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.salary}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">Department: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.department}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <Typography fontWeight="bold">Role: </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">
+                          {data.getUserProfile.role}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <Button
+                style={styles.adminButton}
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  localStorage.removeItem('emailId')
+                  // localStorage.removeItem('userEmail')
+                  return (
+                    navigate('/getall')
+                  )
+                }}
               >
-              All Employees
-            </Button>
+                All Employees
+              </Button>
 
-            {(accessPermissions.includes(PERMISSIONS.UPDATE)) ?
-            <Button
-              style={styles.logoutButton}
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                // {
-                  //   Object.entries(data.getUserProfile).map(([key, value]) => (
+              {(accessPermissions.includes(PERMISSIONS.UPDATE)) ?
+                <Button
+                  style={styles.logoutButton}
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    // {
+                    //   Object.entries(data.getUserProfile).map(([key, value]) => (
                     //     setEmpData({ ...empData, [key]: value })
-                //   ))
-                // }
-                // console.log(empData);
-                // console.log(data);
-                setToShow(true);
+                    //   ))
+                    // }
+                    // console.log(empData);
+                    // console.log(data);
+                    setToShow(true);
 
-              }}
-            >
-              Edit Details
-            </Button>
-            : null }
+                  }}
+                >
+                  Edit Details
+                </Button>
+                : null}
 
-            <Button
-              style={styles.logoutButton}
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                localStorage.removeItem('role')
-                localStorage.removeItem('userEmail')
-                return (
-                  navigate('/')
-                )
-              }}
-            >
-              Logout
-            </Button>
-          </>
-        ) :
-          <form onSubmit={handleUpdateUsers} >
-            <div style={styles.empInput}>
-              <FormLabel>EMP Id</FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
+              <Button
+                style={styles.logoutButton}
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  localStorage.removeItem('role')
+                  localStorage.removeItem('userEmail')
+                  return (
+                    navigate('/')
+                  )
+                }}
+              >
+                Logout
+              </Button>
+            </>
+          ) :
+            <form onSubmit={handleUpdateUsers} >
+              <div style={styles.empInput}>
+                <FormLabel>EMP Id</FormLabel>
+                <TextField
+                  variant="outlined"
+                  margin="dense"
+                  // required
+                  fullWidth
+                  id="id"
+                  name="id"
+                  autoFocus
+                  value={empData.id}
+                  onChange={handleChange}
+                  InputProps={{
+                    readOnly:true
+                  }}
+                />
+              </div>
+
+              <div style={styles.empInput}>
+                <FormLabel>First Name</FormLabel>
+                <TextField
+                  variant="outlined"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="firstname"
+                  name="firstName"
+                  autoFocus
+                  value={empData.firstName}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div style={styles.empInput}>
+                <FormLabel>Last Name</FormLabel>
+                <TextField
+                  variant="outlined"
+                  margin="dense"
+                  fullWidth
+                  id="lastname"
+                  name="lastName"
+                  autoFocus
+                  value={empData.lastName}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div style={styles.empInput}>
+                <FormLabel> Email Id </FormLabel>
+                <TextField
+                  variant="outlined"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="email"
+                  name="email"
+                  autoComplete="email"
+                  value={empData.email}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div style={styles.empInput}>
+                <FormLabel>Phone No.</FormLabel>
+                <TextField
+                  variant="outlined"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="phone"
+                  name="phone"
+                  autoFocus
+                  value={empData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div style={styles.empInput}>
+                <FormLabel>Salary</FormLabel>
+                <TextField
+                  variant="outlined"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="salary"
+                  name="salary"
+                  type="number"
+                  autoFocus
+                  value={empData.salary}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div style={styles.empInput}>
+                <FormLabel>Department</FormLabel>
+                <TextField
+                  variant="outlined"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="department"
+                  name="department"
+                  autoFocus
+                  value={empData.department}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div style={styles.empInput}>
+                
+                <InputLabel id="demo-simple-select-label">Roles</InputLabel>
+                <Select
+                  variant="outlined"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="role"
+                  autoFocus
+                  value={empData.role}
+                  label="Role"
+                  name="role"
+                  onChange={handleChangeRole}
+                >
+                  {Object.entries(allRoles.data.getAllRoles).map(([key, val]) => (
+                    (val.role === "ROOT") ? null :
+                    <MenuItem key={key} value={val.role} > {val.role} </MenuItem>
+                  ))}
+                </Select>
+              </div>
+
+              <Button
+                type="submit"
                 fullWidth
-                id="id"
-                name="id"
-                autoFocus
-                value={empData.id}
-                onChange={handleChange}
-              />
-            </div>
+                variant="contained"
+                color="primary"
+                style={styles.logoutButton}
+              >
+                Update Details
+              </Button>
 
-            <div style={styles.empInput}>
-              <FormLabel>First Name</FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="firstname"
-                name="firstName"
-                autoFocus
-                value={empData.firstName}
-                onChange={handleChange}
-              />
-            </div>
+            </form>
+          }
 
-            <div style={styles.empInput}>
-              <FormLabel>Last Name</FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="lastname"
-                name="lastName"
-                autoFocus
-                value={empData.lastName}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div style={styles.empInput}>
-              <FormLabel> Email Id </FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                name="email"
-                autoComplete="email"
-                value={empData.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div style={styles.empInput}>
-              <FormLabel>Phone No.</FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="phone"
-                name="phone"
-                autoFocus
-                value={empData.phone}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div style={styles.empInput}>
-              <FormLabel>Salary</FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="salary"
-                name="salary"
-                type="number"
-                autoFocus
-                value={empData.salary}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div style={styles.empInput}>
-              <FormLabel>Department</FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="department"
-                name="department"
-                autoFocus
-                value={empData.department}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div style={styles.empInput}>
-              <FormLabel>Role</FormLabel>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="role"
-                name="role"
-                autoFocus
-                value={empData.role}
-                onChange={handleChange}
-              />
-            </div>
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-            >
-              Update Details
-            </Button>
-
-          </form>
-        }
-
-      </Paper>
-    </Container>
+        </Paper>
+      </Container>
 
   )
 };
