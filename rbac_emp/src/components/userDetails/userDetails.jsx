@@ -152,7 +152,7 @@ const UserDetails = () => {
     e.preventDefault();
     // console.log(empData);
     try {
-      const res = await updateUserProfile({
+      await updateUserProfile({
         variables: {
           updatedDetails: {
             firstName: empData.firstName,

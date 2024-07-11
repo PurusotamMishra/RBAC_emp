@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Box,
+ 
   Button,
   Checkbox,
   FormControlLabel,
@@ -22,12 +22,15 @@ import {
   Container,
   Snackbar,
   Alert,
+  // CircularProgress,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import UpdateIcon from "@mui/icons-material/Update";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_ALL_ROLES } from "../../graphql/queries";
+import { GET_ALL_ROLES,
+  // GET_ALL_AVAILABLE_PERMISSIONS,
+ } from "../../graphql/queries";
 import {
   UPDATE_PERMISSIONS_MUTATION,
   CREATE_ROLE_MUTATION,
@@ -93,6 +96,13 @@ const RoleManagement = () => {
     message: "",
     severity: "success",
   });
+  
+  // const availablePermissions = useQuery(GET_ALL_AVAILABLE_PERMISSIONS);
+
+  // if (availablePermissions.loading) return <CircularProgress />;
+  // if (availablePermissions.error) return <Typography>Error: {availablePermissions.error.message}</Typography>;
+
+
 
   useEffect(() => {
     if (data && data.getAllRoles) {

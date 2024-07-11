@@ -41,6 +41,14 @@ query GetAllRoles {
 }
 `;
 
+// export const GET_ALL_AVAILABLE_PERMISSIONS = gql`
+// query GetAvailablePermissisons {
+//   GetAvailablePermissisons {
+    
+//   }
+// }
+// `;
+
 export const GET_PERMISSIONS = gql`
 query GetPermissions($role: String!) {
   getPermissions(role: $role) {

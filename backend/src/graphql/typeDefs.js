@@ -48,6 +48,7 @@ module.exports = gql`
     getAllUsers: [User!]!
     getAllRoles: [RolePermissions!]!
     getPermissions (role: String!) : RolePermissions!
+    getAvailablePermissions: [String]!
   }
 
   type Mutation {

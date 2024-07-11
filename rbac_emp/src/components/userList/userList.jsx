@@ -12,22 +12,16 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
-  Select,
-  MenuItem,
   Button,
-  FormControl,
-  Snackbar,
   DialogTitle,
   Dialog,
   DialogActions,
   DialogContent,
   TextField
 } from "@mui/material";
-import ConfirmationDialog from "./confirmationDialog";
 import { PERMISSIONS } from '../../../const';
 
 import GridOnOutlinedIcon from '@mui/icons-material/GridOnOutlined';
@@ -70,14 +64,6 @@ const styles = {
   },
 };
 
-const paperStyle = {
-  marginTop: "50px",
-  padding: "16px",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-};
-
 const formStyle = {
   width: "100%",
   marginTop: "10px",
@@ -88,10 +74,10 @@ const submitButtonStyle = {
   margin: "25px 0 20px",
 };
 
-const registerLinkStyle = {
-  textDecoration: "none",
-  color: "#1976d2",
-};
+// const registerLinkStyle = {
+//   textDecoration: "none",
+//   color: "#1976d2",
+// };
 
 const flex2 = {
   width: "100%", // Adjust as needed
@@ -107,8 +93,8 @@ const UserList = () => {
   !localStorage.getItem('userEmail') ? navigate('/') : null
 
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  // const [snackbarOpen, setSnackbarOpen] = useState(false);
+  // const [snackbarMessage, setSnackbarMessage] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
   const [user, setUser] = useState([]);
@@ -121,9 +107,6 @@ const UserList = () => {
     variables: {
       role: localStorage.getItem('role')
     },
-    // onCompleted(data){
-
-    // }
   })
   const [deleteUser] = useMutation(DELETE_USER);
   const [registerUser] = useMutation(REGISTER_USER);
@@ -135,7 +118,6 @@ const UserList = () => {
       const response = await registerUser({
         variables: {
           registerInput: {
-            // id: formData.id,
             firstName: formData.firstname,
             lastName: formData.lastname,
             email: formData.email,
@@ -158,7 +140,6 @@ const UserList = () => {
 
 
   const [formData, setFormData] = useState({
-    // id: "",
     firstname: "",
     lastname: "",
     email: "",
@@ -186,7 +167,6 @@ const UserList = () => {
 
 
   const handleDeleteUser = async () => {
-    // console.log("Hello")
     const email = localStorage.getItem('emailId');
     await deleteUser({
       variables: {
@@ -195,8 +175,6 @@ const UserList = () => {
       },
     })
     setUser(user.filter((use) => use.email !== email))
-    // window.location.reload();
-    // console.log(user)
   }
 
 
@@ -245,24 +223,10 @@ const UserList = () => {
             onClose={handleRegisterDialogClose}
           >
             <DialogTitle>
-              {/* <Typography component="h2" variant="h5"> */}
               REGISTER
-              {/* </Typography> */}
             </DialogTitle>
             <DialogContent>
               <form style={formStyle} onSubmit={handleSubmit} >
-                {/* <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="id"
-                label="id "
-                name="id"
-                autoFocus
-                value={formData.id}
-                onChange={handleChange}
-              /> */}
                 <div style={flex2}>
                   <div style={{ flex: 1 }}>
                     <TextField
@@ -362,13 +326,9 @@ const UserList = () => {
               </form>
             </DialogContent>
 
-
-            {/* </Paper> */}
-
-            {/* </Container> */}
           </Dialog>
 
-
+          
           {/* Delete Dialog */}
           <Dialog
             open={deleteDialogOpen}
@@ -410,7 +370,6 @@ const UserList = () => {
                   {(accessPermissions.includes(PERMISSIONS.DELETE)) ? (
                     <>
                       <TableCell style={styles.tableHeadCell}>Actions</TableCell>
-                      {/* <TableCell style={styles.tableHeadCell}>Delete</TableCell> */}
                     </>
                   ) : null
                   }
@@ -437,13 +396,10 @@ const UserList = () => {
                               }}>
                                 <GridOnOutlinedIcon />
                               </Button>
-                              {/* </TableCell>
-                      <TableCell> */}
                               <Button onClick={() => {
                                 localStorage.setItem('emailId', emp.email);
                                 // console.log(user.email)
                                 setDeleteDialogOpen(true);
-
                                 // handleDeleteUser();
                               }}>
                                 <DeleteOutlinedIcon />
@@ -494,7 +450,6 @@ const UserList = () => {
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    // navigate('/register')
                     setRegisterDialogOpen(true);
 
                   }}
@@ -508,8 +463,6 @@ const UserList = () => {
               variant="contained"
               color="primary"
               onClick={() => {
-                // localStorage.removeItem('role')
-                // localStorage.removeItem('userEmail')
                 localStorage.clear();
                 return (
                   navigate('/')
@@ -520,13 +473,13 @@ const UserList = () => {
             </Button>
 
 
-            <Snackbar
+            {/* <Snackbar
               open={snackbarOpen}
               autoHideDuration={6000}
               onClose={() => setSnackbarOpen(false)}
               message={snackbarMessage}
               style={styles.snackbar}
-            />
+            /> */}
           </Paper>
 
         </Container>

@@ -80,6 +80,15 @@ module.exports = {
                 throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
             }
         },
+        
+        async getAvailablePermissions () {
+            try{
+                const availPermissions = await Permission.find();
+                return availPermissions;
+            }catch(err){
+                throw new GraphQLError(`Failed to fetch the permissions: ${err.message}`)
+            }
+        },
 
         async getPermissions(_, { role }) {
             try {
