@@ -56,6 +56,8 @@ module.exports = gql`
     updateUserDetails(updatedDetails: UpdateUserDetailsInput!): User!
     deleteUser(email: String!, isActive: Boolean!): String!
 
+    createPermission(permission: String!): String!
+    deletePermission(permission: String!): String!
     createRole (name: String!) : RolePermissions!
     deleteRole (name: String!) : String!
     updatePermissions (updatePermissions: hasPermissions!) : String!

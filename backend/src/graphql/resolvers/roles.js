@@ -67,7 +67,48 @@ module.exports = {
             } catch (err) {
                 throw new GraphQLError(`Failed to update Permission: ${err.message}`)
             }
+        },
+
+        async createPermission(_, { permission }) {
+            try {
+                const existingPer = await Permission.findOne({ permission })
+
+                if (existingPer) {
+                    throw new GraphQLError("Permission already exists.")
+                }
+
+                const newPerm = new Permission({
+                    permission: permission
+                })
+
+                const res = await newPerm.save();
+
+                return "Success"
+            }catch(error){
+                throw new GraphQLError(`Failed to create new permission: ${error.message}`)
+            }
+        },
+
+        async deletePermission(_, { permission }) {
+            try {
+                const existingPer = await Permission.findOne({ permission })
+
+                if (!existingPer) {
+                    throw new GraphQLError("Permission does not exists.")
+                }
+
+                // const newPerm = new Permission({
+                //     permission: permission
+                // })
+
+                const res = await Permission.deleteOne({ permission });
+
+                return "Success"
+            }catch(error){
+                throw new GraphQLError(`Failed to create new permission: ${error.message}`)
+            }
         }
+
     },
 
     Query: {
@@ -84,7 +125,15 @@ module.exports = {
         async getAvailablePermissions () {
             try{
                 const availPermissions = await Permission.find();
-                return availPermissions;
+
+                const count = await Permission.countDocuments(); // Get the total number of users
+                let permissions = [];
+                for(let i=0; i<count; i++){
+                    // console.log(availPermissions[0].permission)
+                    permissions.push(availPermissions[i].permission)
+                }
+
+                return permissions;
             }catch(err){
                 throw new GraphQLError(`Failed to fetch the permissions: ${err.message}`)
             }

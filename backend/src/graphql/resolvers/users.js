@@ -112,7 +112,7 @@ module.exports = {
 
     async getAllUsers() {
       try {
-        const roles = await User.find();
+        const roles = await User.find({"isActive": true});
         return roles;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch all users: ${error.message}`);
